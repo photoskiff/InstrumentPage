@@ -4,10 +4,10 @@ import { InstrumentPage } from './InstrumentPage';
 
 function App() {
   return (
-    <div className="App">
-      <div>
+    <div className="App-header">
+      <h1>
         Instrument Page
-      </div>
+      </h1>
       <InstrumentPage/>
     </div>
   );

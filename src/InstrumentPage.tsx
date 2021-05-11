@@ -1,8 +1,6 @@
-import { Button, Select } from "antd";
+import { Button, Select, Input } from "antd";
 import 'antd/dist/antd.css'
 import React, { useCallback, useEffect, KeyboardEvent, ChangeEvent, useState } from "react"
-import Dropdown, { Option } from 'react-dropdown';
-import 'react-dropdown/style.css';
 import { SalesPerson, Instrument, Level } from "./model";
 import { loadInstruments, loadSalePersons } from "./services";
 
@@ -20,10 +18,19 @@ export const InstrumentPage = () => {
     const [instruments, setInstruments] = useState<Instrument[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [{ instrument, instrumentLevel, salesPerson, amount }, setPageState] = useState<PageState>({ instrumentLevel: Level.Price });
+    const [loading, setLoading] = useState([true, true]);
 
+    const fetchInstruments = useCallback(async () => {
+        setInstruments(await loadInstruments());
+        setLoading(([_, s]) => [false, s]);
+    }, []);
 
-    const fetchInstruments = useCallback(async () => setInstruments(await loadInstruments()), []);
-    const fetchSalePersons = useCallback(async () => setSalesPersons(await loadSalePersons()), []);
+    const fetchSalePersons = useCallback(async () => {
+        setSalesPersons(await loadSalePersons())
+        setLoading(([i, _]) => [i, false]);
+    }, []);
+
+    const allLoading = () => loading[0] || loading[1];
 
     useEffect(() => {
         setInputValue("");
@@ -46,8 +53,8 @@ export const InstrumentPage = () => {
         fetchSalePersons();
     }, [fetchInstruments, fetchSalePersons])
 
-    const instrumentChanged = (v: Option) => {
-        const instr = instruments.find(i => i.name === v.value);
+    const instrumentChanged = (v: string) => {
+        const instr = instruments.find(i => i.name === v);
         const level = instr?.levels[0] ?? Level.Price;
         setPageState(s => ({ ...s, instrument: instr, instrumentLevel: level }))
     }
@@ -58,8 +65,8 @@ export const InstrumentPage = () => {
         setPageState(s => ({ ...s, instrumentLevel: level }));
     }
 
-    const salePersonChanged = (v: Option) => {
-        const person = salesPersons.find(i => i.name === v.value);
+    const salePersonChanged = (v: string) => {
+        const person = salesPersons.find(i => i.name === v);
         setPageState(s => ({ ...s, salesPerson: person }));
     }
 
@@ -75,6 +82,14 @@ export const InstrumentPage = () => {
     const AntdLevelOption = (l: Level) => {
         const value = l.toString();
         return <Opt key={value} value={value}>{`${Level[l]} (${l})`}</Opt>
+    }
+
+    const InstrumentOption = (i: Instrument) => {
+        return <Opt key={i.name} value={i.name}>{i.name}</Opt>
+    }
+
+    const SalesPersonOption = (p: SalesPerson) => {
+        return <Opt key={p.name} value={p.name}>{p.name}</Opt>
     }
 
     const tryChangeLevel = (e: ChangeEvent<HTMLInputElement>) => {
@@ -101,40 +116,58 @@ export const InstrumentPage = () => {
         }
     }
 
+    const filterOption = (input: string, option: any) => option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+
     return (<div>
         <div className='row'>
             <div>
-                <Dropdown options={instruments.map(i => i.name)} onChange={instrumentChanged} 
-                value={instrument?.name} placeholder="select an instrument" />
-                
-            </div>
-            <div>
-                <Dropdown options={salesPersons.map(p => p.name)} onChange={salePersonChanged} value={salesPerson?.name} placeholder="select a sales person" />
-            </div>
-            <div>
-
-                <input placeholder="enter level" onChange={tryChangeLevel} value={inputValue} onKeyDown={handleKeyDown} />
-            </div>
-            <div>
-                <Select size="middle" style={{ width: 120 }} onChange={levelChanged} showSearch
-                    placeholder="Instr Level"
-                    defaultValue={Level.Price.toString()}
-                    value={instrumentLevel.toString()}
-                    filterOption={(input, option) =>
-                        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }>
-
-                    {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
+                <div className='label'>Instrument</div>
+                <Select size="middle" style={{ width: 120 }} onChange={instrumentChanged} showSearch
+                    placeholder="instrument"
+                    value={instrument?.name}
+                    filterOption={filterOption}>
+                    {instruments.map(InstrumentOption)}
+                    loading={loading[0]}
                 </Select>
-
-
+            </div>
+            <div>
+                <div className='label'>Sales Person</div>
+                <div>
+                    <Select size="middle" style={{ width: 120 }} onChange={salePersonChanged} showSearch
+                        placeholder="instrument"
+                        value={salesPerson?.name}
+                        filterOption={filterOption}>
+                        {salesPersons.map(SalesPersonOption)}
+                        loading={loading[1]}
+                    </Select>
+                </div>
+            </div>
+            <div >
+                <div className='label row compact' style={{justifyContent:"center"}}>Instrument Level</div>
+                <div className='row compact'>
+                    <div>
+                        <Input disabled={loading[0]} placeholder="enter level" onChange={tryChangeLevel} value={inputValue} onKeyDown={handleKeyDown} />
+                    </div>
+                    <div>
+                        <Select size="middle" style={{ width: 120 }} onChange={levelChanged}
+                            loading={loading[0]}
+                            defaultValue={Level.Price.toString()}
+                            value={instrumentLevel.toString()}>
+                            {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
+                        </Select>
+                    </div>
+                </div>
             </div>
         </div>
-        <p/>
-        <input placeholder='enter amount' value={amount ?? ""} onChange={tryChangeAmount} onKeyDown={tryClearAmount} />
-        <p/>
-        <Button type="primary" style={{ marginLeft: 8 }} onClick={reportState} disabled={!instrument || !instrumentLevel || !salesPerson || !amount}>
-            submit
-        </Button>
+        <div>
+            <div className='row' style={{ justifyContent: "center" }}>
+                <Input disabled={allLoading()} placeholder='enter amount' value={amount && amount > 0 ? amount : ""} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
+            </div>
+            <div className='row' style={{ justifyContent: "center" }}>
+                <Button type="primary" onClick={reportState} disabled={!instrument || !instrumentLevel || !salesPerson || !amount}>
+                    submit
+                </Button>
+            </div>
+        </div>
     </div>)
 }
