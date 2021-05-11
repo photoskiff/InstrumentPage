@@ -8,6 +8,7 @@ type PageState = {
     instrument?: Instrument,
     salesPerson?: SalesPerson,
     instrumentLevel: Level,
+    levelInput?: number,
     amount?: number,
 }
 
@@ -16,8 +17,7 @@ const { Option: Opt } = Select;
 export const InstrumentPage = () => {
     const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
     const [instruments, setInstruments] = useState<Instrument[]>([]);
-    const [inputValue, setInputValue] = useState("");
-    const [{ instrument, instrumentLevel, salesPerson, amount }, setPageState] = useState<PageState>({ instrumentLevel: Level.Price });
+    const [{ instrument, instrumentLevel, salesPerson, amount, levelInput }, setPageState] = useState<PageState>({ instrumentLevel: Level.Price });
     const [loading, setLoading] = useState([true, true]);
 
     const fetchInstruments = useCallback(async () => {
@@ -33,17 +33,12 @@ export const InstrumentPage = () => {
     const allLoading = () => loading[0] || loading[1];
 
     useEffect(() => {
-        setInputValue("");
-    }, [instrument, instruments])
-
-    useEffect(() => {
         const instrument = instruments.length ? instruments[0] : undefined;
         const salesPerson = salesPersons.length ? salesPersons[0] : undefined;
         const state: PageState = {
             instrument,
             salesPerson,
             instrumentLevel: Level.Price,
-            amount: undefined
         };
         setPageState(() => state);
     }, [salesPersons, instruments])
@@ -56,13 +51,12 @@ export const InstrumentPage = () => {
     const instrumentChanged = (v: string) => {
         const instr = instruments.find(i => i.name === v);
         const level = instr?.levels[0] ?? Level.Price;
-        setPageState(s => ({ ...s, instrument: instr, instrumentLevel: level }))
+        setPageState(s => ({ ...s, instrument: instr, instrumentLevel: level, levelInput:undefined }))
     }
 
     const levelChanged = (v: string) => {
         const level = +v;
-        setInputValue("");
-        setPageState(s => ({ ...s, instrumentLevel: level }));
+        setPageState(s => ({ ...s, instrumentLevel: level, levelInput:undefined }));
     }
 
     const salePersonChanged = (v: string) => {
@@ -72,16 +66,16 @@ export const InstrumentPage = () => {
 
     const reportState = () => {
         const replacer = (key: any, val: any) => {
-            if (key === "instrumentLevel") return `${Level[val]} (${val})`;
-            if (key === "levels") return val.map((v: any) => `${Level[v]} (${v})`);
+            if (key === "instrumentLevel") return Level[val];
+            if (key === "levels") return val.map((v: any) => Level[v]);
             return val;
         };
-        console.log(JSON.stringify({ instrument, instrumentLevel, salesPerson, amount }, replacer, 2));
+        console.log(JSON.stringify({ instrument, instrumentLevel, levelInput, salesPerson, amount }, replacer, 2));
     }
 
     const AntdLevelOption = (l: Level) => {
         const value = l.toString();
-        return <Opt key={value} value={value}>{`${Level[l]} (${l})`}</Opt>
+        return <Opt key={value} value={value}>{Level[l]}</Opt>
     }
 
     const InstrumentOption = (i: Instrument) => {
@@ -93,30 +87,31 @@ export const InstrumentPage = () => {
     }
 
     const tryChangeLevel = (e: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-        const level = +e.target.value;
-        level && instrument?.levels.some(l => l === level) && setPageState(s => ({ ...s, instrumentLevel: level }));
+        const val = +e.target.value;
+        if (typeof (val) !== 'number' || Number.isNaN(val) || val < 0) return;
+        setPageState(s => ({ ...s, levelInput: val }));
     }
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const tryClearLevelInput = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Escape") {
-            setInputValue("");
+            setPageState(s => ({...s, levelInput:undefined}))
         }
     }
 
     const tryChangeAmount = (e: ChangeEvent<HTMLInputElement>) => {
         const val = +e.target.value;
         if (typeof (val) !== 'number' || Number.isNaN(val) || val < 0) return;
-        setPageState({ instrument, instrumentLevel, salesPerson, amount: val });
+        setPageState(s => ({ ...s, amount: val }));
     }
 
     const tryClearAmount = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Escape") {
-            setPageState({ instrument, instrumentLevel, salesPerson, amount: undefined });
+            setPageState(s => ({ ...s, amount: undefined }));
         }
     }
 
-    const filterOption = (input: string, option: any) => option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    const filterOption = (input: string, option: any) => option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const inputValue = (v:number | undefined) => v && v > 0 ? v : "";
 
     return (<div>
         <div className='row'>
@@ -143,11 +138,8 @@ export const InstrumentPage = () => {
                 </div>
             </div>
             <div >
-                <div className='label row compact' style={{justifyContent:"center"}}>Instrument Level</div>
+                <div className='label row compact' style={{ justifyContent: "center" }}>Instrument Level</div>
                 <div className='row compact'>
-                    <div>
-                        <Input disabled={loading[0]} placeholder="enter level" onChange={tryChangeLevel} value={inputValue} onKeyDown={handleKeyDown} />
-                    </div>
                     <div>
                         <Select size="middle" style={{ width: 120 }} onChange={levelChanged}
                             loading={loading[0]}
@@ -156,15 +148,19 @@ export const InstrumentPage = () => {
                             {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
                         </Select>
                     </div>
+                <div>
+                    <Input disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel} 
+                    value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} />
+                </div>
                 </div>
             </div>
         </div>
         <div>
             <div className='row' style={{ justifyContent: "center" }}>
-                <Input disabled={allLoading()} placeholder='enter amount' value={amount && amount > 0 ? amount : ""} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
+                <Input disabled={allLoading()} placeholder='enter amount' value={inputValue(amount)} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
             </div>
             <div className='row' style={{ justifyContent: "center" }}>
-                <Button type="primary" onClick={reportState} disabled={!instrument || !instrumentLevel || !salesPerson || !amount}>
+                <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
                     submit
                 </Button>
             </div>
