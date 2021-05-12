@@ -70,7 +70,13 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
         // };
         // const data = JSON.stringify({ instrument, instrumentLevel, levelInput, salesPerson, amount }, replacer, 2)
         // console.log(data);
-        const report = { Instrument: instrument?.name, "Level Type": Level[instrumentLevel], Level: levelInput, "Sales Person": salesPerson?.name, Amount: amount };
+        const report = { 
+            Instrument: instrument?.name, 
+            "Sales Person": salesPerson?.name, 
+            "Level Type": Level[instrumentLevel], 
+            Level: levelInput, 
+            Amount: amount 
+        };
         console.table(report);
     }
 
@@ -145,7 +151,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
                 {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
             </Select>
 
-            <div className='label'>Level Value</div>
+            <div className='label'>Level</div>
             <Input data-testid="level-input" disabled={loading[0]} placeholder="Enter level value" onChange={tryChangeLevel}
                 value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} className='sized' />
 
