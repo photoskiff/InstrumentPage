@@ -114,60 +114,50 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
     const filterOption = (input: string, option: any) => option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     const inputValue = (v: number | undefined) => v && v > 0 ? v : "";
 
-    return (<div>
-        <div className='row'>
+    return (
+        <div className='grid'>
+            <div className='label'>Instrument</div>
+            <Select size="middle" className='sized' onChange={instrumentChanged} showSearch
+                data-testid="instrument-select"
+                placeholder="instrument"
+                value={instrument?.name}
+                filterOption={filterOption}>
+                {instruments.map(InstrumentOption)}
+                loading={loading[0]}
+            </Select>
+
+            <div className='label'>Sales Person</div>
             <div>
-                <div className='label'>Instrument</div>
-                <Select size="middle" style={{ width: 120 }} onChange={instrumentChanged} showSearch
-                    data-testid="instrument-select"
-                    placeholder="instrument"
-                    value={instrument?.name}
+                <Select size="middle" className='sized' onChange={salePersonChanged} showSearch
+                    data-testid="sales-person-select"
+                    placeholder="sales person"
+                    value={salesPerson?.name}
                     filterOption={filterOption}>
-                    {instruments.map(InstrumentOption)}
-                    loading={loading[0]}
+                    {salesPersons.map(SalesPersonOption)}
+                    loading={loading[1]}
                 </Select>
             </div>
+            <div className='label'>Level Type</div>
             <div>
-                <div className='label'>Sales Person</div>
-                <div>
-                    <Select size="middle" style={{ width: 120 }} onChange={salePersonChanged} showSearch
-                        data-testid="sales-person-select"
-                        placeholder="sales person"
-                        value={salesPerson?.name}
-                        filterOption={filterOption}>
-                        {salesPersons.map(SalesPersonOption)}
-                        loading={loading[1]}
-                    </Select>
-                </div>
+                <Select size="middle" className='sized' onChange={levelChanged}
+                    data-testid="level-type-select"
+                    loading={loading[0]}
+                    defaultValue={Level.Price.toString()}
+                    value={instrumentLevel.toString()}>
+                    {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
+                </Select>
             </div>
-            <div >
-                <div className='label row compact' style={{ justifyContent: "center" }}>Instrument Level</div>
-                <div className='row compact'>
-                    <div>
-                        <Select size="middle" style={{ width: 120 }} onChange={levelChanged}
-                            data-testid="level-type-select"
-                            loading={loading[0]}
-                            defaultValue={Level.Price.toString()}
-                            value={instrumentLevel.toString()}>
-                            {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
-                        </Select>
-                    </div>
-                    <div>
-                        <Input data-testid="level-input" disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel}
-                            value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} />
-                    </div>
-                </div>
+            <div className='label'>Level Value</div>
+            <div>
+                <Input data-testid="level-input" disabled={loading[0]} placeholder="Enter level value" onChange={tryChangeLevel}
+                    value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} className='sized' />
             </div>
-        </div>
-        <div>
-            <div className='row' style={{ justifyContent: "center" }}>
-                <Input data-testid="amount-input" disabled={allLoading()} placeholder='enter amount' value={inputValue(amount)} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
-            </div>
-            <div className='row' style={{ justifyContent: "center" }}>
-                <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
-                    submit
-                </Button>
-            </div>
-        </div>
-    </div>)
+            <div className='label'>Amount</div>
+            <Input data-testid="amount-input" disabled={allLoading()} placeholder='Enter amount' value={inputValue(amount)}
+                onChange={tryChangeAmount} onKeyDown={tryClearAmount} className='sized' />
+            <div />
+            <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
+                submit
+            </Button>
+        </div>)
 }

@@ -31,6 +31,10 @@ body {
   margin:0px 10px 
 }
 
+.sized{
+  width:200px !important;
+}
+
 h1 {
   color: white !important;
   background-color: darkcyan;
@@ -45,5 +49,16 @@ h1 {
 
 .column {
   display: flex;
+
+}
+
+.grid{
+  width:400px;
+  height:250px;
+  display:grid;
+  grid-template-columns: 20% auto;
+  justify-items: start;
+  justify-content: space-evenly;
+  align-items: center;
 
 }

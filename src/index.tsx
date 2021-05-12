@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { loadInstruments, loadSalePersons, loadInstrumentsFast, loadSalePersonsFast } from "./service/services";
+// import { loadInstruments, loadSalePersons,  } from "./service/services";
+import { loadInstrumentsFast, loadSalePersonsFast } from "./service/services";
 
 
 
