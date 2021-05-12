@@ -32,9 +32,10 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
     const allLoading = () => loading[0] || loading[1];
 
     useEffect(() => {
-        const instrument = instruments.length ? instruments[0] : undefined;
+        // const instrument = instruments.length ? instruments[0] : undefined;
         // const salesPerson = salesPersons.length ? salesPersons[0] : undefined;
         const salesPerson = undefined;
+        const instrument = undefined;
         const state: PageState = {
             instrument,
             salesPerson,
@@ -130,6 +131,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
                 <div className='label'>Sales Person</div>
                 <div>
                     <Select size="middle" style={{ width: 120 }} onChange={salePersonChanged} showSearch
+                        data-testid="sales-person-select"
                         placeholder="sales person"
                         value={salesPerson?.name}
                         filterOption={filterOption}>
@@ -143,6 +145,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
                 <div className='row compact'>
                     <div>
                         <Select size="middle" style={{ width: 120 }} onChange={levelChanged}
+                            data-testid="level-type-select"
                             loading={loading[0]}
                             defaultValue={Level.Price.toString()}
                             value={instrumentLevel.toString()}>
@@ -150,7 +153,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
                         </Select>
                     </div>
                     <div>
-                        <Input disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel}
+                        <Input data-testid="level-input" disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel}
                             value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} />
                     </div>
                 </div>
@@ -158,7 +161,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
         </div>
         <div>
             <div className='row' style={{ justifyContent: "center" }}>
-                <Input disabled={allLoading()} placeholder='enter amount' value={inputValue(amount)} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
+                <Input data-testid="amount-input" disabled={allLoading()} placeholder='enter amount' value={inputValue(amount)} onChange={tryChangeAmount} onKeyDown={tryClearAmount} style={{ width: 200 }} />
             </div>
             <div className='row' style={{ justifyContent: "center" }}>
                 <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
