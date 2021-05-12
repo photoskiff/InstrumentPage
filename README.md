@@ -11,8 +11,6 @@ http://www.photoblink.com/instruments
 // import { loadInstruments, loadSalePersons,  } from "./service/services";
 import { loadInstrumentsFast, loadSalePersonsFast } from "./service/services";
 
-
-
 ReactDOM.render(
   <React.StrictMode>
     <App salesPersonsLoader={loadSalePersonsFast} instrumentLoader={loadInstrumentsFast}/>
