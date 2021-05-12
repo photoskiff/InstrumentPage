@@ -1,4 +1,5 @@
 # Instrument Page
 
-Live demo of this project can be found at
-photoblink.com/instruments
+A live demo of this project can be found at
+<br/>
+http://www.photoblink.com/instruments
