@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
-import { InstrumentPage } from './InstrumentPage';
+import { InstrumentPage,  } from './InstrumentPage';
+import { loadInstruments, loadSalePersons } from "./services";
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <h1>
         Instrument Page
       </h1>
-      <InstrumentPage/>
+      <InstrumentPage salesPersonsLoader={loadSalePersons} instrumentLoader={loadInstruments}/>
     </div>
   );
 }

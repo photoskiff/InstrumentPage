@@ -2,7 +2,12 @@ import { Button, Select, Input } from "antd";
 import 'antd/dist/antd.css'
 import React, { useCallback, useEffect, KeyboardEvent, ChangeEvent, useState } from "react"
 import { SalesPerson, Instrument, Level } from "./model";
-import { loadInstruments, loadSalePersons } from "./services";
+
+
+export type Loaders = {
+    instrumentLoader: () => Promise<Instrument[]>,
+    salesPersonsLoader: () => Promise<SalesPerson[]>,
+}
 
 type PageState = {
     instrument?: Instrument,
@@ -14,21 +19,21 @@ type PageState = {
 
 const { Option: Opt } = Select;
 
-export const InstrumentPage = () => {
+export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) => {
     const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
     const [instruments, setInstruments] = useState<Instrument[]>([]);
     const [{ instrument, instrumentLevel, salesPerson, amount, levelInput }, setPageState] = useState<PageState>({ instrumentLevel: Level.Price });
     const [loading, setLoading] = useState([true, true]);
 
     const fetchInstruments = useCallback(async () => {
-        setInstruments(await loadInstruments());
+        setInstruments(await instrumentLoader());
         setLoading(([_, s]) => [false, s]);
-    }, []);
+    }, [instrumentLoader]);
 
     const fetchSalePersons = useCallback(async () => {
-        setSalesPersons(await loadSalePersons())
+        setSalesPersons(await salesPersonsLoader())
         setLoading(([i, _]) => [i, false]);
-    }, []);
+    }, [salesPersonsLoader]);
 
     const allLoading = () => loading[0] || loading[1];
 
