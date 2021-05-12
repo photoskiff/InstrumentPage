@@ -13,13 +13,15 @@ function App({ instrumentLoader, salesPersonsLoader }: Loaders) {
   const [instruments, setInstruments] = useState<Instrument[]>([]);
 
   const fetchInstruments = useCallback(async () => {
-    setInstruments(await instrumentLoader());
+    const instr = await instrumentLoader();
+    setInstruments(instr);
   }, [instrumentLoader]);
 
   const fetchSalePersons = useCallback(async () => {
-    setSalesPersons(await salesPersonsLoader())
+    const sp = await salesPersonsLoader();
+    setSalesPersons(sp);
   }, [salesPersonsLoader]);
-  
+
   useEffect(() => {
     fetchInstruments();
     fetchSalePersons();

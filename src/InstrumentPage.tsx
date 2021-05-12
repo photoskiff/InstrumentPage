@@ -33,7 +33,8 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
 
     useEffect(() => {
         const instrument = instruments.length ? instruments[0] : undefined;
-        const salesPerson = salesPersons.length ? salesPersons[0] : undefined;
+        // const salesPerson = salesPersons.length ? salesPersons[0] : undefined;
+        const salesPerson = undefined;
         const state: PageState = {
             instrument,
             salesPerson,
@@ -117,6 +118,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
             <div>
                 <div className='label'>Instrument</div>
                 <Select size="middle" style={{ width: 120 }} onChange={instrumentChanged} showSearch
+                    data-testid="instrument-select"
                     placeholder="instrument"
                     value={instrument?.name}
                     filterOption={filterOption}>
@@ -128,7 +130,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
                 <div className='label'>Sales Person</div>
                 <div>
                     <Select size="middle" style={{ width: 120 }} onChange={salePersonChanged} showSearch
-                        placeholder="instrument"
+                        placeholder="sales person"
                         value={salesPerson?.name}
                         filterOption={filterOption}>
                         {salesPersons.map(SalesPersonOption)}
