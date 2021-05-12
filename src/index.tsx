@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+//uncomment to test slow loading
 // import { loadInstruments, loadSalePersons,  } from "./service/services";
 import { loadInstrumentsFast, loadSalePersonsFast } from "./service/services";
-
-
 
 ReactDOM.render(
   <React.StrictMode>
