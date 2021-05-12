@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { loadInstruments, loadSalePersons, loadInstrumentsFast, loadSalePersonsFast } from "./service/services";
+
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App salesPersonsLoader={loadSalePersonsFast} instrumentLoader={loadInstrumentsFast}/>
   </React.StrictMode>,
   document.getElementById('root')
 );

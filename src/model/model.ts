@@ -1,5 +1,6 @@
 export type SalesPerson = {
-    name: string
+    name: string,
+    id: number,
 }
 
 export enum Level {

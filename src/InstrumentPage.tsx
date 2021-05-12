@@ -1,12 +1,13 @@
+import React, { useEffect, KeyboardEvent, ChangeEvent, useState } from "react"
 import { Button, Select, Input } from "antd";
 import 'antd/dist/antd.css'
-import React, { useCallback, useEffect, KeyboardEvent, ChangeEvent, useState } from "react"
-import { SalesPerson, Instrument, Level } from "./model";
+import { SalesPerson, Instrument, Level } from "./model/model";
 
+const { Option } = Select;
 
-export type Loaders = {
-    instrumentLoader: () => Promise<Instrument[]>,
-    salesPersonsLoader: () => Promise<SalesPerson[]>,
+type PageProps = {
+    salesPersons: SalesPerson[],
+    instruments: Instrument[]
 }
 
 type PageState = {
@@ -17,23 +18,16 @@ type PageState = {
     amount?: number,
 }
 
-const { Option: Opt } = Select;
 
-export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) => {
-    const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
-    const [instruments, setInstruments] = useState<Instrument[]>([]);
+export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
     const [{ instrument, instrumentLevel, salesPerson, amount, levelInput }, setPageState] = useState<PageState>({ instrumentLevel: Level.Price });
     const [loading, setLoading] = useState([true, true]);
 
-    const fetchInstruments = useCallback(async () => {
-        setInstruments(await instrumentLoader());
-        setLoading(([_, s]) => [false, s]);
-    }, [instrumentLoader]);
+    useEffect(() => {
+        setLoading([instruments.length === 0, salesPersons.length === 0]);
 
-    const fetchSalePersons = useCallback(async () => {
-        setSalesPersons(await salesPersonsLoader())
-        setLoading(([i, _]) => [i, false]);
-    }, [salesPersonsLoader]);
+    }, [salesPersons, instruments])
+
 
     const allLoading = () => loading[0] || loading[1];
 
@@ -48,20 +42,17 @@ export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) =
         setPageState(() => state);
     }, [salesPersons, instruments])
 
-    useEffect(() => {
-        fetchInstruments();
-        fetchSalePersons();
-    }, [fetchInstruments, fetchSalePersons])
+
 
     const instrumentChanged = (v: string) => {
         const instr = instruments.find(i => i.name === v);
         const level = instr?.levels[0] ?? Level.Price;
-        setPageState(s => ({ ...s, instrument: instr, instrumentLevel: level, levelInput:undefined }))
+        setPageState(s => ({ ...s, instrument: instr, instrumentLevel: level, levelInput: undefined }))
     }
 
     const levelChanged = (v: string) => {
         const level = +v;
-        setPageState(s => ({ ...s, instrumentLevel: level, levelInput:undefined }));
+        setPageState(s => ({ ...s, instrumentLevel: level, levelInput: undefined }));
     }
 
     const salePersonChanged = (v: string) => {
@@ -70,25 +61,28 @@ export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) =
     }
 
     const reportState = () => {
-        const replacer = (key: any, val: any) => {
-            if (key === "instrumentLevel") return Level[val];
-            if (key === "levels") return val.map((v: any) => Level[v]);
-            return val;
-        };
-        console.log(JSON.stringify({ instrument, instrumentLevel, levelInput, salesPerson, amount }, replacer, 2));
+        // const replacer = (key: any, val: any) => {
+        //     if (key === "instrumentLevel") return Level[val];
+        //     if (key === "levels") return val.map((v: any) => Level[v]);
+        //     return val;
+        // };
+        // const data = JSON.stringify({ instrument, instrumentLevel, levelInput, salesPerson, amount }, replacer, 2)
+        // console.log(data);
+        const report = { Instrument: instrument?.name, "Level Type": Level[instrumentLevel], Level: levelInput, "Sales Person": salesPerson?.name, Amount: amount };
+        console.table(report);
     }
 
     const AntdLevelOption = (l: Level) => {
         const value = l.toString();
-        return <Opt key={value} value={value}>{Level[l]}</Opt>
+        return <Option key={value} value={value}>{Level[l]}</Option>
     }
 
     const InstrumentOption = (i: Instrument) => {
-        return <Opt key={i.name} value={i.name}>{i.name}</Opt>
+        return <Option key={i.name} value={i.name}>{i.name}</Option>
     }
 
     const SalesPersonOption = (p: SalesPerson) => {
-        return <Opt key={p.name} value={p.name}>{p.name}</Opt>
+        return <Option key={p.name} value={p.name}>{p.name}</Option>
     }
 
     const tryChangeLevel = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +93,7 @@ export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) =
 
     const tryClearLevelInput = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Escape") {
-            setPageState(s => ({...s, levelInput:undefined}))
+            setPageState(s => ({ ...s, levelInput: undefined }))
         }
     }
 
@@ -116,7 +110,7 @@ export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) =
     }
 
     const filterOption = (input: string, option: any) => option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-    const inputValue = (v:number | undefined) => v && v > 0 ? v : "";
+    const inputValue = (v: number | undefined) => v && v > 0 ? v : "";
 
     return (<div>
         <div className='row'>
@@ -153,10 +147,10 @@ export const InstrumentPage = ({instrumentLoader, salesPersonsLoader}:Loaders) =
                             {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
                         </Select>
                     </div>
-                <div>
-                    <Input disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel} 
-                    value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} />
-                </div>
+                    <div>
+                        <Input disabled={loading[0]} placeholder="enter lelel value" onChange={tryChangeLevel}
+                            value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} />
+                    </div>
                 </div>
             </div>
         </div>
