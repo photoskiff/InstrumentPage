@@ -127,37 +127,35 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
             </Select>
 
             <div className='label'>Sales Person</div>
-            <div>
-                <Select size="middle" className='sized' onChange={salePersonChanged} showSearch
-                    data-testid="sales-person-select"
-                    placeholder="sales person"
-                    value={salesPerson?.name}
-                    filterOption={filterOption}>
-                    {salesPersons.map(SalesPersonOption)}
-                    loading={loading[1]}
-                </Select>
-            </div>
+            <Select size="middle" className='sized' onChange={salePersonChanged} showSearch
+                data-testid="sales-person-select"
+                placeholder="sales person"
+                value={salesPerson?.name}
+                filterOption={filterOption}>
+                {salesPersons.map(SalesPersonOption)}
+                loading={loading[1]}
+            </Select>
+
             <div className='label'>Level Type</div>
-            <div>
-                <Select size="middle" className='sized' onChange={levelChanged}
-                    data-testid="level-type-select"
-                    loading={loading[0]}
-                    defaultValue={Level.Price.toString()}
-                    value={instrumentLevel.toString()}>
-                    {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
-                </Select>
-            </div>
+            <Select size="middle" className='sized' onChange={levelChanged}
+                data-testid="level-type-select"
+                loading={loading[0]}
+                defaultValue={Level.Price.toString()}
+                value={instrumentLevel.toString()}>
+                {instrument?.levels.map(l => AntdLevelOption(l)) ?? [AntdLevelOption(Level.Price)]}
+            </Select>
+
             <div className='label'>Level Value</div>
-            <div>
-                <Input data-testid="level-input" disabled={loading[0]} placeholder="Enter level value" onChange={tryChangeLevel}
-                    value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} className='sized' />
-            </div>
+            <Input data-testid="level-input" disabled={loading[0]} placeholder="Enter level value" onChange={tryChangeLevel}
+                value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} className='sized' />
+
             <div className='label'>Amount</div>
             <Input data-testid="amount-input" disabled={allLoading()} placeholder='Enter amount' value={inputValue(amount)}
                 onChange={tryChangeAmount} onKeyDown={tryClearAmount} className='sized' />
+
             <div />
             <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
-                submit
+                Submit
             </Button>
         </div>)
 }
