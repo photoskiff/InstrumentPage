@@ -1,5 +1,5 @@
 import React, { useEffect, KeyboardEvent, ChangeEvent, useState } from "react"
-import { Button, Select, Input } from "antd";
+import { Button, Select, Input, message } from "antd";
 import 'antd/dist/antd.css'
 import { SalesPerson, Instrument, Level } from "./model/model";
 
@@ -78,6 +78,7 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
             Amount: amount 
         };
         console.table(report);
+        message.info("Submitted. Press F12 to see the result.");
     }
 
     const AntdLevelOption = (l: Level) => {
@@ -152,14 +153,15 @@ export const InstrumentPage = ({ salesPersons, instruments }: PageProps) => {
             </Select>
 
             <div className='label'>Level</div>
-            <Input data-testid="level-input" disabled={loading[0]} placeholder="Enter level value" onChange={tryChangeLevel}
+            <Input data-testid="level-input" disabled={loading[0]} placeholder="enter level value" onChange={tryChangeLevel}
                 value={inputValue(levelInput)} onKeyDown={tryClearLevelInput} className='sized' />
 
             <div className='label'>Amount</div>
-            <Input data-testid="amount-input" disabled={allLoading()} placeholder='Enter amount' value={inputValue(amount)}
+            <Input data-testid="amount-input" disabled={allLoading()} placeholder='enter amount' value={inputValue(amount)}
                 onChange={tryChangeAmount} onKeyDown={tryClearAmount} className='sized' />
 
-            <div />
+            <div/>
+            
             <Button type="primary" onClick={reportState} disabled={!instrument || !salesPerson || !amount || !levelInput}>
                 Submit
             </Button>
